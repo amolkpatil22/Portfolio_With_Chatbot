@@ -1,0 +1,38 @@
+import React from 'react';
+import { useState } from 'react';
+import ServerStartup from './components/ServerStartup';
+import Header from './components/Header';
+import Hero from './components/Hero';
+import About from './components/About';
+import Projects from './components/Projects';
+import Skills from './components/Skills';
+import Contact from './components/Contact';
+import Footer from './components/Footer';
+
+function App() {
+  const [serverReady, setServerReady] = useState(false);
+
+  const handleServerReady = () => {
+    setServerReady(true);
+  };
+
+  // Show server startup screen first
+  if (!serverReady) {
+    return <ServerStartup onServerReady={handleServerReady} />;
+  }
+
+  // Show portfolio once server is ready
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-cyan-50">
+      <Header />
+      <Hero />
+      <About />
+      <Skills />
+      <Projects />
+      <Contact />
+      <Footer />
+    </div>
+  );
+}
+
+export default App;
