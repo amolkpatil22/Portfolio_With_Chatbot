@@ -11,5 +11,6 @@ import { PineconeService } from '../pinecone/pinecone.service';
   ],
   controllers: [PortfolioController],
   providers: [PortfolioService, PineconeService],
+  exports: [PortfolioService],
 })
 export class PortfolioModule {}

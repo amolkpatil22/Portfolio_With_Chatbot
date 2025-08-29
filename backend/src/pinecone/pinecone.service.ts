@@ -44,12 +44,14 @@ export class PineconeService implements OnModuleInit {
   }
 
   async query(text: string, topK: number = 5) {
-    const result = await this.index.query({
-      text,
-      topK,
-      includeMetadata: true,
+    const result = await this.index.searchRecords({
+      query: {
+        topK,
+        inputs: { text }
+      }
     });
-    return result.matches;
+    console.log("🚀 ~ PineconeService ~ query ~ result:", result.result.hits)
+    return result.result.hits;
   }
 
   async deleteVector(id: string) {
