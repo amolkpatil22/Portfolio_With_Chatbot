@@ -14,30 +14,38 @@ export class PineconeService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    await this.pinecone.createIndexForModel({
-      name: this.indexName,
-      cloud: 'aws',
-      region: 'us-east-1',
-      embed: {
-        model: 'llama-text-embed-v2',
-        fieldMap: { text: 'chunk_text' },
-      },
-      waitUntilReady: true,
-    });
+    try {
+      await this.pinecone.createIndexForModel({
+        name: this.indexName,
+        cloud: 'aws',
+        region: 'us-east-1',
+        embed: {
+          model: 'llama-text-embed-v2',
+          fieldMap: { text: 'chunk_text' },
+        },
+        waitUntilReady: true,
+      });
+    } catch (error: any) {
+      if (error.message?.includes('ALREADY_EXISTS')) {
+        console.log('Index already exists, using existing index');
+      } else {
+        throw error;
+      }
+    }
     this.index = this.pinecone.index(this.indexName);
   }
 
-  async upsert(id: string, text: string, metadata: any) {
-    await this.index.upsert([{
+  async upsertRecords(id: string, text: string, metadata: any) {
+    await this.index.upsertRecords([{
       id,
       chunk_text: text,
-      metadata,
+      // metadata,
     }]);
   }
 
   async query(text: string, topK: number = 5) {
     const result = await this.index.query({
-      chunk_text: text,
+      text,
       topK,
       includeMetadata: true,
     });

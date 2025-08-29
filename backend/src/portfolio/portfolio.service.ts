@@ -17,12 +17,11 @@ export class PortfolioService {
     const createdPortfolio = new this.portfolioModel(createPortfolioDto);
     const saved = await createdPortfolio.save();
 
-    await this.pineconeService.upsert((saved as any)?._id?.toString(),
+    await this.pineconeService.upsertRecords((saved as any)?._id?.toString(),
       `${saved.type},${saved.title},${saved.content}`,
       {
         type: saved.type,
         title: saved.title,
-        metadata: saved.metadata,
       });
 
     return saved;
@@ -32,7 +31,7 @@ export class PortfolioService {
     const updated = await this.portfolioModel.findByIdAndUpdate(id, updatePortfolioDto, { new: true }).exec();
 
     if (updated && updatePortfolioDto.content) {
-      await this.pineconeService.upsert(id, updated.content, {
+      await this.pineconeService.upsertRecords(id, updated.content, {
         type: updated.type,
         title: updated.title,
         metadata: updated.metadata,
