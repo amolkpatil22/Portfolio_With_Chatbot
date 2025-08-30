@@ -1,19 +1,19 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Pinecone } from '@pinecone-database/pinecone';
 
-@Injectable()
-export class PineconeService implements OnModuleInit {
+export class PineconeService {
   private pinecone: Pinecone;
   private index: any;
   private indexName = 'portfolio-index';
+  private initPromise: Promise<void>;
 
   constructor() {
     this.pinecone = new Pinecone({
       apiKey: process.env.PINECONE_API_KEY || "",
     });
+    this.initPromise = this.init();
   }
 
-  async onModuleInit() {
+  private async init() {
     try {
       await this.pinecone.createIndexForModel({
         name: this.indexName,
@@ -27,15 +27,14 @@ export class PineconeService implements OnModuleInit {
       });
     } catch (error: any) {
       if (error.message?.includes('ALREADY_EXISTS')) {
-        console.log('Index already exists, using existing index');
-      } else {
-        throw error;
+        console.log('Index already exists');
       }
     }
     this.index = this.pinecone.index(this.indexName);
   }
 
   async upsertRecords(id: string, text: string, metadata: any) {
+    await this.initPromise;
     await this.index.upsertRecords([{
       id,
       chunk_text: text,
@@ -44,17 +43,13 @@ export class PineconeService implements OnModuleInit {
   }
 
   async query(text: string, topK: number = 5) {
+    await this.initPromise;
     const result = await this.index.searchRecords({
       query: {
         topK,
         inputs: { text }
       }
     });
-    console.log("🚀 ~ PineconeService ~ query ~ result:", result.result.hits)
     return result.result.hits;
-  }
-
-  async deleteVector(id: string) {
-    await this.index.deleteOne(id);
   }
 }
