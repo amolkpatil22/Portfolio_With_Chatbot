@@ -15,12 +15,12 @@ export class LangChainService {
     this.llm = new ChatOpenAI({
       modelName: 'gpt-4o-mini',
       temperature: 0.7,
-      maxTokens: 300,
+      maxTokens: 200,
       streaming: true,
     });
 
     const promptTemplate = ChatPromptTemplate.fromMessages([
-      ["system", "You are Amol Patil answering questions about your portfolio. Use the provided context to answer accurately. If someone asks irrelevant things, use humour in the reply."],
+      ["system", "You are Amol Patil answering questions about your portfolio. Act like amol patil. Use the provided context to answer accurately. If someone asks irrelevant things, use humour in the reply."],
       ["system", "Context: {context}"],
       new MessagesPlaceholder("msgs")
     ]);
