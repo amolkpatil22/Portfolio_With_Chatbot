@@ -8,7 +8,7 @@ interface ServerStartupProps {
 const ServerStartup: React.FC<ServerStartupProps> = ({ onServerReady }) => {
   const [status, setStatus] = useState<'starting' | 'success' | 'error'>('starting');
   const [message, setMessage] = useState('Waking up the server...');
-  const [countdown, setCountdown] = useState(30);
+  const [countdown, setCountdown] = useState(60);
 
   useEffect(() => {
     startServer();
@@ -17,8 +17,8 @@ const ServerStartup: React.FC<ServerStartupProps> = ({ onServerReady }) => {
   const startServer = async () => {
     try {
       setStatus('starting');
-      setMessage('Starting server... Maximum wait time: 30 seconds');
-
+      setMessage('Starting server... Maximum wait time: 60 seconds');
+      
       // Countdown timer
       const countdownInterval = setInterval(() => {
         setCountdown(prev => {
@@ -32,9 +32,9 @@ const ServerStartup: React.FC<ServerStartupProps> = ({ onServerReady }) => {
         });
       }, 1000);
 
-      // Replace this URL with your actual server startup endpoint
-      const response = await fetch('https://ai-interviewer-lzlj.onrender.com', {
-        method: 'POST',
+      // Check if server is running
+      const response = await fetch('https://portfolio-with-chatbot-iwd0.onrender.com', {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -45,7 +45,7 @@ const ServerStartup: React.FC<ServerStartupProps> = ({ onServerReady }) => {
       if (response.ok) {
         setStatus('success');
         setMessage('Server is ready! Redirecting to portfolio...');
-
+        
         // Wait 2 seconds before redirecting
         setTimeout(() => {
           onServerReady();
@@ -121,7 +121,7 @@ const ServerStartup: React.FC<ServerStartupProps> = ({ onServerReady }) => {
           {/* Additional Info */}
           <div className="mt-6 text-white/60 text-xs">
             <p>Free servers need time to wake up</p>
-            <p>Maximum wait time: 30 seconds</p>
+            <p>Maximum wait time: 60 seconds</p>
           </div>
         </div>
       </div>

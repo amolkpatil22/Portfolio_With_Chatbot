@@ -31,8 +31,11 @@ function App() {
       <Projects />
       <Contact />
       <Footer />
+      <Chatbot />
     </div>
   );
 }
+
+import Chatbot from './components/Chatbot';
 
 export default App;
