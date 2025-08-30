@@ -51,7 +51,6 @@ export class PortfolioService {
 
   async vectorSearch(query: string, topK: number = 5) {
     const matches = await this.pineconeService.query(query, topK);
-    console.log("🚀 ~ PortfolioService ~ vectorSearch ~ matches:", matches)
 
     const ids = matches.map(match => match._id);
     const portfolios = await this.portfolioModel.find({ _id: { $in: ids } }).exec();

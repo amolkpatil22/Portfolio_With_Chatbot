@@ -7,17 +7,16 @@ export class ChatbotController {
   constructor(private readonly chatbotService: ChatbotService) {}
 
   @Post('chat')
-  async chat(@Body('message') message: string, @Res() res: Response) {
+  async chat(@Body() body: { message: string, history?: any[] }, @Res() res: Response) {
     res.setHeader('Content-Type', 'text/plain');
     res.setHeader('Transfer-Encoding', 'chunked');
 
     try {
-      for await (const chunk of this.chatbotService.chatStream(message)) {
+      for await (const chunk of this.chatbotService.chatStream(body.message, body.history)) {
         res.write(chunk);
       }
       res.end();
     } catch (error) {
-      console.log("🚀 ~ ChatbotController ~ chat ~ error:", error)
       res.status(500).end('Error generating response');
     }
   }

@@ -1,18 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PortfolioService } from '../portfolio/portfolio.service';
-import { GptService } from '../gpt/gpt.service';
+import { LangChainService } from '../langchain/langchain.service';
 
 @Injectable()
 export class ChatbotService {
-  constructor(
-    private portfolioService: PortfolioService,
-    private gptService: GptService,
-  ) {}
+  constructor(private langChainService: LangChainService) {}
 
-  async *chatStream(query: string) {
-    const searchResults = await this.portfolioService.vectorSearch(query, 3);
-    
-    for await (const chunk of this.gptService.generateStreamResponse(query, searchResults)) {
+  async *chatStream(query: string, history?: any[]) {
+    for await (const chunk of this.langChainService.chatStream(query, history)) {
       yield chunk;
     }
   }
