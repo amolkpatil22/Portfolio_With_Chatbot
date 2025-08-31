@@ -1,7 +1,12 @@
-import React from 'react';
-import { Code, Coffee, Users, Award } from 'lucide-react';
+import { Code, Coffee, Users, Award, Loader2 } from 'lucide-react';
+import { useIntersectionFetch } from '../hooks/useIntersectionFetch';
+import { api, Portfolio } from '../services/api';
 
 const About = () => {
+  const { data: aboutData, loading, setRef } = useIntersectionFetch<Portfolio[]>(
+    () => api.getPortfolioByType('personal')
+  );
+
   const stats = [
     { icon: Code, label: 'Projects Completed', value: '50+' },
     { icon: Coffee, label: 'Cups of Coffee', value: '1000+' },
@@ -10,7 +15,7 @@ const About = () => {
   ];
 
   return (
-    <section id="about" className="py-20 bg-gradient-to-br from-cyan-50 to-blue-50">
+    <section ref={setRef} id="about" className="py-20 bg-gradient-to-br from-cyan-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
@@ -27,28 +32,25 @@ const About = () => {
             <h3 className="text-2xl md:text-3xl font-bold text-gray-800">
               I'm a passionate developer who loves creating amazing experiences
             </h3>
-            
-            <div className="space-y-4 text-gray-600 leading-relaxed">
-              <p>
-                With over 3 years of experience in web development, I specialize in creating 
-                robust, scalable applications using modern technologies. My journey began with 
-                a curiosity for how things work on the web, which evolved into a passion for 
-                building digital solutions that make a difference.
-              </p>
-              
-              <p>
-                I have extensive experience in React, Node.js, Python, and various databases. 
-                I'm particularly interested in full-stack development, cloud technologies, and 
-                creating seamless user experiences. I believe in writing clean, maintainable 
-                code and following best practices.
-              </p>
-              
-              <p>
-                When I'm not coding, you can find me exploring new technologies, contributing 
-                to open source projects, or sharing knowledge with the developer community. 
-                I'm always excited to take on new challenges and collaborate on innovative projects.
-              </p>
-            </div>
+
+            {loading ? (
+              <div className="flex items-center space-x-2">
+                <Loader2 className="w-6 h-6 animate-spin text-purple-600" />
+                <span className="text-gray-600">Loading...</span>
+              </div>
+            ) : aboutData && aboutData.length > 0 ? (
+              <div className="space-y-4 text-gray-600 leading-relaxed">
+                {aboutData.map((item) => (
+                  <p key={item._id}>{item.content}</p>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4 text-gray-600 leading-relaxed">
+                <p>
+                  No data to show, Please refresh the page
+                </p>
+              </div>
+            )}
 
             <div className="pt-4">
               <h4 className="text-xl font-semibold text-gray-800 mb-4">Education & Certifications</h4>
