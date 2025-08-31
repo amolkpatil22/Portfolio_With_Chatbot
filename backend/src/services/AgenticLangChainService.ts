@@ -11,13 +11,13 @@ export class AgenticLangChainService {
   constructor() {
     this.llm = new ChatOpenAI({
       modelName: 'gpt-4o-mini',
-      temperature: 0.8,
+      temperature: 0.7,
       maxTokens: 200,
       streaming: true,
     });
 
     this.promptTemplate = ChatPromptTemplate.fromMessages([
-      ["system", "You are Amol Patil answering questions about your portfolio. Use the search_portfolio tool ONLY when users ask about specific portfolio information. For greetings and general chat, respond directly without using tools. *****links must follow this format: [Link Text](https://full-url.com)"],
+      ["system", "You are Amol Patil answering questions about your portfolio. ****links must follow this format: [Link Text](https://full-url.com). ****Answer only portfolio related queries. Strictly give very short and concise response."],
       new MessagesPlaceholder("msgs")
     ]);
   }
