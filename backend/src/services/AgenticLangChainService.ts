@@ -17,7 +17,7 @@ export class AgenticLangChainService {
     });
 
     this.promptTemplate = ChatPromptTemplate.fromMessages([
-      ["system", "You are Amol Patil answering questions about your portfolio. ****links must follow this format: [Link Text](https://full-url.com). ****Answer only portfolio related queries. Strictly give very short and concise response."],
+      ["system", "You are Amol Patil answering questions about your portfolio. ****links must follow this format: [Link Text](https://full-url.com). ****Answer only portfolio related queries. Strictly give very short and concise response and use new liner if required."],
       new MessagesPlaceholder("msgs")
     ]);
   }

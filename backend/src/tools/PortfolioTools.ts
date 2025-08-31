@@ -2,9 +2,11 @@ import { Portfolio } from '../models/Portfolio';
 import { ServiceManager } from '../services/ServiceManager';
 
 export class PortfolioTools {
-  static async searchPortfolio(query: string) {
+  static async searchPortfolio(query: string, type?: string) {
     const pineconeService = ServiceManager.getPineconeService();
-    const hits = await pineconeService.query(query, 2);
+    
+    // Use Pinecone metadata filtering if type is specified
+    const hits = await pineconeService.query(query, 3, type);
     const ids = hits.map((hit: any) => hit._id);
     const portfolios = await Portfolio.find({ _id: { $in: ids } }).lean();
 
@@ -14,7 +16,7 @@ export class PortfolioTools {
 
       let metadataText = "";
       if (portfolio.metadata) {
-        metadataText = "\nMetadata:\n" +
+        metadataText = "\nMetadata:\n" + 
           Object.entries(portfolio.metadata)
             .map(([key, value]) => `- ${key}: ${typeof value === "object" ? JSON.stringify(value) : value}`)
             .join("\n");
@@ -25,26 +27,33 @@ export class PortfolioTools {
   }
 
   static getToolDefinitions() {
-    return [{
-      name: "search_portfolio",
-      description: "Search Amol's portfolio for information about projects, skills, experience, social media links or personal details",
-      parameters: {
-        type: "object",
-        properties: {
-          query: {
-            type: "string",
-            description: "Search query for portfolio information"
-          }
-        },
-        required: ["query"]
+    return [
+      {
+        name: "search_portfolio",
+        description: "Search Amol's portfolio using vector similarity. Available types: project, experience, personal, skill, faq, education",
+        parameters: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Search query for portfolio information"
+            },
+            type: {
+              type: "string",
+              description: "Optional: Filter by specific type using Pinecone metadata (project, experience, personal, skill, faq, education)",
+              enum: ["project", "experience", "personal", "skill", "faq", "education"]
+            }
+          },
+          required: ["query"]
+        }
       }
-    }];
+    ];
   }
 
   static async executeTool(toolName: string, args: any) {
     switch (toolName) {
       case 'search_portfolio':
-        return await this.searchPortfolio(args.query);
+        return await this.searchPortfolio(args.query, args.type);
       default:
         throw new Error(`Unknown tool: ${toolName}`);
     }

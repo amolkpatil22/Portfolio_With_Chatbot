@@ -42,14 +42,24 @@ export class PineconeService {
     }]);
   }
 
-  async query(text: string, topK: number = 5) {
+  async query(text: string, topK: number = 5, typeFilter?: string) {
     await this.initPromise;
-    const result = await this.index.searchRecords({
+    
+    const queryOptions: any = {
       query: {
         topK,
         inputs: { text }
       }
-    });
+    };
+
+    // Add metadata filter if type is specified
+    if (typeFilter) {
+      queryOptions.query.filter = {
+        type: { $eq: typeFilter }
+      };
+    }
+
+    const result = await this.index.searchRecords(queryOptions);
     return result.result.hits;
   }
 }
