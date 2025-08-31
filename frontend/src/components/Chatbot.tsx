@@ -55,7 +55,7 @@ const Chatbot = () => {
     
     // Simple keyword-based responses - you can replace this with actual AI integration
     if (message.includes('experience') || message.includes('work')) {
-      return "John has over 3 years of experience in full-stack development. He's worked on e-commerce platforms, task management apps, and various web applications using React, Node.js, and modern technologies.";
+      return "John has over 3 years of experience in full-stack development. He's worked at TechCorp Solutions as a Senior Full Stack Developer, StartupXYZ building fintech applications, and Digital Agency Pro creating client websites. Check out his Experience section for detailed work history!";
     }
     
     if (message.includes('skills') || message.includes('technology') || message.includes('tech')) {

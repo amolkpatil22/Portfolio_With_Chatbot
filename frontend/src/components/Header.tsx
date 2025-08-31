@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, X, Code, Home, User, Briefcase, Mail } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Menu, X, Code, Home, User, Briefcase, Mail, Clock } from 'lucide-react';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,14 +16,14 @@ const Header = () => {
   const navItems = [
     { href: '#home', label: 'Home', icon: Home },
     { href: '#about', label: 'About', icon: User },
+    { href: '#experience', label: 'Experience', icon: Clock },
     { href: '#projects', label: 'Projects', icon: Briefcase },
     { href: '#contact', label: 'Contact', icon: Mail },
   ];
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
-    }`}>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
+      }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
