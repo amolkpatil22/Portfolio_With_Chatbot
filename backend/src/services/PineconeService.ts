@@ -38,7 +38,7 @@ export class PineconeService {
     await this.index.upsertRecords([{
       id,
       chunk_text: text,
-      // metadata,
+      ...metadata,
     }]);
   }
 

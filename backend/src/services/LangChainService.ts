@@ -52,7 +52,6 @@ export class LangChainService {
 
             return `${portfolio.type}: ${portfolio.title}\n${portfolio.content}${metadataText}`;
           }).filter(Boolean).join("\n\n");
-          console.log("🚀 ~ LangChainService ~ constructor ~ cont:", cont)
 
           return cont
         },

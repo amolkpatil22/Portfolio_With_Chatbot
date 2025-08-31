@@ -11,8 +11,9 @@ router.post('/', async (req, res) => {
     const saved = await portfolio.save();
 
     const pineconeService = ServiceManager.getPineconeService();
+
     await pineconeService.upsertRecords((saved as any)._id.toString(),
-      `${saved.type},${saved.title},${saved.content}`,
+      `${saved.type},${saved.title},${saved.semanticSearchKeys?.join(',')}`,
       {
         type: saved.type,
         title: saved.title,
