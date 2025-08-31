@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
+import { api } from '../services/api';
 
 interface Message {
   id: string;
@@ -8,20 +9,44 @@ interface Message {
   timestamp: Date;
 }
 
+interface ChatHistory {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 const Chatbot = () => {
   const [showNotification, setShowNotification] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: "Hi! I'm John's AI assistant. I can tell you about his experience, projects, and skills. How can I help you today?",
-      sender: 'bot',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Load messages from session storage
+  useEffect(() => {
+    const savedMessages = sessionStorage.getItem('chatMessages');
+    if (savedMessages) {
+      setMessages(JSON.parse(savedMessages).map((msg: any) => ({
+        ...msg,
+        timestamp: new Date(msg.timestamp)
+      })));
+    } else {
+      const welcomeMessage: Message = {
+        id: '1',
+        text: "Hi! I'm Amol's AI assistant. I can tell you about his experience, projects, and skills. How can I help you today?",
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages([welcomeMessage]);
+    }
+  }, []);
+
+  // Save messages to session storage
+  useEffect(() => {
+    if (messages.length > 0) {
+      sessionStorage.setItem('chatMessages', JSON.stringify(messages));
+    }
+  }, [messages]);
 
   // Show notification after 3 seconds
   useEffect(() => {
@@ -50,44 +75,17 @@ const Chatbot = () => {
     scrollToBottom();
   }, [messages]);
 
-  const getBotResponse = (userMessage: string): string => {
-    const message = userMessage.toLowerCase();
-    
-    // Simple keyword-based responses - you can replace this with actual AI integration
-    if (message.includes('experience') || message.includes('work')) {
-      return "John has over 3 years of experience in full-stack development. He's worked at TechCorp Solutions as a Senior Full Stack Developer, StartupXYZ building fintech applications, and Digital Agency Pro creating client websites. Check out his Experience section for detailed work history!";
-    }
-    
-    if (message.includes('skills') || message.includes('technology') || message.includes('tech')) {
-      return "John specializes in React, TypeScript, Node.js, Python, PostgreSQL, and AWS. He's also experienced with Next.js, Express.js, MongoDB, and various other modern web technologies.";
-    }
-    
-    if (message.includes('project') || message.includes('portfolio')) {
-      return "John has built several impressive projects including an e-commerce platform with Stripe integration, a collaborative task management app with real-time features, and a social media analytics dashboard. You can check them out in the Projects section!";
-    }
-    
-    if (message.includes('contact') || message.includes('hire') || message.includes('work together')) {
-      return "John is always open to new opportunities! You can reach him at john.doe@email.com or use the contact form below. He typically responds within 24 hours.";
-    }
-    
-    if (message.includes('education') || message.includes('degree')) {
-      return "John has a Bachelor's degree in Computer Science and holds AWS Certified Developer certification. He's also completed various online courses in full-stack development.";
-    }
-    
-    if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
-      return "Hello! Great to meet you! I'm here to help you learn more about John and his work. What would you like to know?";
-    }
-    
-    if (message.includes('location') || message.includes('where')) {
-      return "John is based in San Francisco, CA, but he's open to remote work opportunities worldwide.";
-    }
-    
-    // Default response
-    return "That's a great question! I can tell you about John's experience, skills, projects, education, or how to contact him. What specific aspect would you like to know more about?";
+  const getChatHistory = (): ChatHistory[] => {
+    return messages
+      .filter(msg => msg.id !== '1') // Exclude welcome message
+      .map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      }));
   };
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || isTyping) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -96,22 +94,55 @@ const Chatbot = () => {
       timestamp: new Date()
     };
 
+    const currentInput = inputMessage;
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate typing delay
-    setTimeout(() => {
-      const botResponse: Message = {
+    try {
+      const history = getChatHistory();
+      const response = await api.chat(currentInput, history);
+      const reader = response.body?.getReader();
+      
+      if (reader) {
+        let botResponse = '';
+        const botMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: '',
+          sender: 'bot',
+          timestamp: new Date()
+        };
+        
+        setMessages(prev => [...prev, botMessage]);
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = new TextDecoder().decode(value);
+          botResponse += chunk;
+          
+          setMessages(prev => 
+            prev.map(msg => 
+              msg.id === botMessage.id 
+                ? { ...msg, text: botResponse }
+                : msg
+            )
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
+      const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: getBotResponse(inputMessage),
+        text: 'Sorry, I encountered an error. Please try again.',
         sender: 'bot',
         timestamp: new Date()
       };
-      
-      setMessages(prev => [...prev, botResponse]);
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -161,8 +192,8 @@ const Chatbot = () => {
                 <Bot className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-semibold">John's AI Assistant</h3>
-                <p className="text-xs text-white/80">Ask me anything about John!</p>
+                <h3 className="font-semibold">Amol's AI Assistant</h3>
+                <p className="text-xs text-white/80">Ask me anything about Amol!</p>
               </div>
             </div>
           </div>
@@ -214,8 +245,8 @@ const Chatbot = () => {
                   <div className="bg-white px-4 py-2 rounded-2xl border border-gray-200">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                     </div>
                   </div>
                 </div>
@@ -232,14 +263,14 @@ const Chatbot = () => {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask me about John's experience..."
-                className="flex-1 px-4 py-2 bg-gray-50 text-gray-800 rounded-xl border border-gray-200 focus:border-purple-400 focus:outline-none transition-colors duration-200"
+                placeholder="Ask about Amol's experience, projects, skills..."
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 disabled={isTyping}
               />
               <button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim() || isTyping}
-                className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105"
+                className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full flex items-center justify-center hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="w-4 h-4" />
               </button>

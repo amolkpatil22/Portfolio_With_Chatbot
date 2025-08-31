@@ -14,12 +14,12 @@ export class LangChainService {
     this.llm = new ChatOpenAI({
       modelName: 'gpt-4o-mini',
       temperature: 0.7,
-      maxTokens: 300,
+      maxTokens: 100,
       streaming: true,
     });
 
     const promptTemplate = ChatPromptTemplate.fromMessages([
-      ["system", "You are Amol Patil answering questions about your portfolio. Use the provided context to answer accurately. If someone asks irrelevant things, use humour in the reply."],
+      ["system", "You are Amol Patil's AI assistant answering questions about portfolio. Use the provided context to answer accurately. If someone asks irrelevant things, use humour in the reply"],
       ["system", "Context: {context}"],
       new MessagesPlaceholder("msgs")
     ]);
@@ -28,19 +28,39 @@ export class LangChainService {
       {
         context: async (input: { question: string, history?: any[] }) => {
           const pineconeService = new PineconeService();
-          const hits = await pineconeService.query(input.question, 3);
-          const ids = hits.map((hit: any) => hit.id);
-          const portfolios = await Portfolio.find({ _id: { $in: ids } });
-          
-          return hits.map((hit: any) => {
-            const portfolio = portfolios.find((p: any) => p._id.toString() === hit.id);
-            return `${portfolio?.type}: ${portfolio?.title}\n${portfolio?.content}`;
-          }).join('\n\n');
+          const hits = await pineconeService.query(input.question, 2);
+          const ids = hits.map((hit: any) => hit._id);
+          const portfolios = await Portfolio.find({ _id: { $in: ids } }).lean();
+
+          const cont = hits.map((hit: any) => {
+            const portfolio = portfolios.find((p: any) => p._id.toString() === hit._id);
+            if (!portfolio) return "";
+
+            let metadataText = "";
+            if (portfolio.metadata) {
+              metadataText =
+                "\nMetadata:\n" +
+                Object.entries(portfolio.metadata)
+                  .map(([key, value]) => {
+                    if (typeof value === "object" && value !== null) {
+                      return `- ${key}: ${JSON.stringify(value)}`;
+                    }
+                    return `- ${key}: ${value}`;
+                  })
+                  .join("\n");
+            }
+
+            return `${portfolio.type}: ${portfolio.title}\n${portfolio.content}${metadataText}`;
+          }).filter(Boolean).join("\n\n");
+          console.log("🚀 ~ LangChainService ~ constructor ~ cont:", cont)
+
+          return cont
         },
         msgs: (input: { question: string, history?: any[] }) => {
           const messages: BaseMessage[] = [];
           if (input.history) {
-            input.history.forEach((msg: any) => {
+            const recentHistory = input.history.slice(-10);
+            recentHistory.forEach((msg: any) => {
               if (msg.role === 'user') {
                 messages.push(new HumanMessage(msg.content));
               } else {
