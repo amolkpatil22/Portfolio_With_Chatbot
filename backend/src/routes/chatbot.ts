@@ -14,17 +14,15 @@ router.post('/chat', async (req, res) => {
   res.setHeader('Transfer-Encoding', 'chunked');
 
   try {
-   
-    const langChainService = ServiceManager.getLangChainService();
+    const agenticService = ServiceManager.getAgenticLangChainService();
     
-    // Stream response with conversation history
-    for await (const chunk of langChainService.chatStream(message, history)) {
+    // Stream agentic response
+    for await (const chunk of agenticService.chatStream(message, history)) {
       res.write(chunk);
     }
     res.end();
   } catch (error: any) {
     console.error('❌ Chat error:', error.message);
-    console.error('❌ Full error:', error);
     res.status(500).end(`Error: ${error.message}`);
   }
 });
