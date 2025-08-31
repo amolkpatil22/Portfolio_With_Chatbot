@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
 // Get by type
 router.get('/:type', async (req, res) => {
   try {
-    const portfolios = await Portfolio.find({ type: req.params.type });
+    const portfolios = await Portfolio.find({ type: req.params.type }).sort({ "metadata.index": 1 })
     res.json(portfolios);
   } catch (error: any) {
     res.status(500).json({ error: error.message });

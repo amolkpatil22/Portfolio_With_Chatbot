@@ -1,13 +1,11 @@
 import { Github, Linkedin, Mail, Download, ChevronDown, Loader2 } from 'lucide-react';
 import { useIntersectionFetch } from '../hooks/useIntersectionFetch';
 import { api, Portfolio } from '../services/api';
-import { convertGoogleDriveUrl } from '../utils/googleDrive';
 
 const Hero = () => {
   const { data: aboutData, loading, setRef } = useIntersectionFetch<Portfolio[]>(
     () => api.getPortfolioByType('personal')
   );
-  console.log("🚀 ~ Hero ~ aboutData:", aboutData)
 
   return (
     <section ref={setRef} id="home" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 relative overflow-hidden">
@@ -63,7 +61,7 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               {aboutData?.[0]?.metadata?.links?.resume ? (
                 <a
-                  href={convertGoogleDriveUrl(aboutData[0].metadata.links.resume as string, 'download')}
+                  href={aboutData[0].metadata.links.resume as string}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-white text-purple-600 hover:bg-gray-50 px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl flex items-center gap-2"
@@ -74,12 +72,9 @@ const Hero = () => {
               ) : (
                 <button className="bg-white text-purple-600 hover:bg-gray-50 px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl flex items-center gap-2">
                   <Download size={20} />
-                  Download Resume
+                  Resume Not Available
                 </button>
               )}
-              <a href="#projects" className="border-2 border-white text-white hover:bg-white hover:text-purple-600 px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105">
-                View My Work
-              </a>
             </div>
 
             {/* Social Links */}
@@ -104,9 +99,9 @@ const Hero = () => {
                   <Linkedin size={28} />
                 </a>
               )}
-              {aboutData?.[0]?.metadata?.links?.email && (
+              {aboutData?.[0]?.metadata?.email && (
                 <a
-                  href={`mailto:${aboutData[0].metadata.links.email}`}
+                  href={`mailto:${aboutData[0].metadata.email}`}
                   className="text-white/70 hover:text-white transition-all duration-200 hover:scale-110 transform bg-white/10 p-3 rounded-full hover:bg-white/20"
                 >
                   <Mail size={28} />
