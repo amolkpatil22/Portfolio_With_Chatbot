@@ -19,7 +19,7 @@ export class LangChainService {
     });
 
     const promptTemplate = ChatPromptTemplate.fromMessages([
-      ["system", "You are Amol Patil's chatbot for portfolio. ***Don't entertain out of scope questions. Add new liner if required."],
+      ["system", "You are Amol Patil's chatbot for portfolio. ***Don't entertain out of scope questions. Add new liner if required. *****links must follow this format: [Link Text](https://full-url.com)"],
       ["system", "Context: {context}"],
       new MessagesPlaceholder("msgs")
     ]);
