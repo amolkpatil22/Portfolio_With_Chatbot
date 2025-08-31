@@ -6,17 +6,20 @@ const About = () => {
   const { data: aboutData, loading, setRef } = useIntersectionFetch<Portfolio[]>(
     () => api.getPortfolioByType('personal')
   );
+  const { data: educationData, loading: isEduationLoading, setRef: educationRef } = useIntersectionFetch<Portfolio[]>(
+    () => api.getPortfolioByType('education')
+  );
 
   const stats = [
-    { icon: Code, label: 'Projects Completed', value: '50+' },
+    { icon: Code, label: 'Projects Completed', value: '10+' },
     { icon: Coffee, label: 'Cups of Coffee', value: '1000+' },
-    { icon: Users, label: 'Happy Clients', value: '25+' },
-    { icon: Award, label: 'Years Experience', value: '3+' },
+    { icon: Users, label: 'Happy Clients', value: '4+' },
+    { icon: Award, label: 'Years Experience', value: '2+' },
   ];
 
   return (
     <section ref={setRef} id="about" className="py-20 bg-gradient-to-br from-cyan-50 to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div ref={educationRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
             About Me
@@ -40,8 +43,8 @@ const About = () => {
               </div>
             ) : aboutData && aboutData.length > 0 ? (
               <div className="space-y-4 text-gray-600 leading-relaxed">
-                {aboutData.map((item) => (
-                  <p key={item._id}>{item.content}</p>
+                {aboutData[0].content.split("\n\n").map((para, idx) => (
+                  <p key={idx}>{para}</p>
                 ))}
               </div>
             ) : (
@@ -52,13 +55,41 @@ const About = () => {
               </div>
             )}
 
-            <div className="pt-4">
+            <div className="pt-4" >
               <h4 className="text-xl font-semibold text-gray-800 mb-4">Education & Certifications</h4>
-              <div className="space-y-2 text-gray-600">
-                <p>• Bachelor's in Computer Science - University Name (2020)</p>
-                <p>• AWS Certified Developer - Associate</p>
-                <p>• Full Stack Web Development Certification</p>
-              </div>
+              {isEduationLoading ? (
+                <div className="flex items-center space-x-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-purple-600" />
+                  <span className="text-gray-600">Loading education...</span>
+                </div>
+              ) : educationData && educationData.length > 0 ? (
+                <div className="space-y-4">
+                  {educationData
+                    .map((edu) => (
+                      <div key={edu._id} className="bg-white/50 p-4 rounded-lg border border-purple-100">
+                        <div className="flex justify-between items-start mb-2">
+                          <h5 className="font-semibold text-gray-800">{edu.metadata?.degree} in {edu.metadata?.field}</h5>
+                          <span className="text-sm text-purple-600 font-medium">{edu.metadata?.year}</span>
+                        </div>
+                        <p className="text-gray-600 text-sm mb-2">{edu.metadata?.issuer}, {edu.metadata?.location}</p>
+                        {edu.metadata?.links?.certificate && (
+                          <a
+                            href={edu.metadata.links.certificate as string}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center text-sm text-purple-600 hover:text-purple-800 transition-colors"
+                          >
+                            View Certificate →
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <div className="text-gray-500 text-sm">
+                  No education data available
+                </div>
+              )}
             </div>
           </div>
 

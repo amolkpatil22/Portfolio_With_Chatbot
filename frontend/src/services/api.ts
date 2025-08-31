@@ -2,14 +2,14 @@ const API_BASE = 'http://localhost:3000';
 
 export interface Portfolio {
   _id: string;
-  type: 'project' | 'experience' | 'personal' | 'skill' | 'faq';
+  type: 'project' | 'education' | 'experience' | 'personal' | 'skill' | 'faq';
   title: string;
   content: string;
   metadata?: {
     tech_stack?: string[];
     role?: string;
     duration?: string;
-    links?: object;
+    links?: { [key: string]: any };
     [key: string]: any;
   };
   createdAt: string;
@@ -35,7 +35,7 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message, history })
     });
-    
+
     if (!response.ok) throw new Error('Chat failed');
     return response;
   }

@@ -33,7 +33,7 @@ const ServerStartup: React.FC<ServerStartupProps> = ({ onServerReady }) => {
       }, 1000);
 
       // Check if server is running
-      const response = await fetch('https://portfolio-with-chatbot-iwd0.onrender.com', {
+      const response = await fetch('http://localhost:3000', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
