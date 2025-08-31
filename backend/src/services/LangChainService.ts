@@ -4,7 +4,7 @@ import { RunnableSequence } from '@langchain/core/runnables';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { HumanMessage, AIMessage, BaseMessage } from '@langchain/core/messages';
 import { Portfolio } from '../models/Portfolio';
-import { PineconeService } from './PineconeService';
+import { ServiceManager } from './ServiceManager';
 
 export class LangChainService {
   private llm: ChatOpenAI;
@@ -27,7 +27,7 @@ export class LangChainService {
     this.ragChain = RunnableSequence.from([
       {
         context: async (input: { question: string, history?: any[] }) => {
-          const pineconeService = new PineconeService();
+          const pineconeService = ServiceManager.getPineconeService();
           const hits = await pineconeService.query(input.question, 2);
           const ids = hits.map((hit: any) => hit._id);
           const portfolios = await Portfolio.find({ _id: { $in: ids } }).lean();
