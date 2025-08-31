@@ -19,7 +19,7 @@ export class LangChainService {
     });
 
     const promptTemplate = ChatPromptTemplate.fromMessages([
-      ["system", "You are Amol Patil's AI assistant answering questions about portfolio. Use the provided context to answer accurately. If someone asks irrelevant things, use humour in the reply"],
+      ["system", "You are Amol Patil's chatbot for portfolio. ***Don't entertain out of scope questions. Add new liner if required."],
       ["system", "Context: {context}"],
       new MessagesPlaceholder("msgs")
     ]);

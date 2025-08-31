@@ -103,7 +103,7 @@ const Chatbot = () => {
       const history = getChatHistory();
       const response = await api.chat(currentInput, history);
       const reader = response.body?.getReader();
-      
+
       if (reader) {
         let botResponse = '';
         const botMessage: Message = {
@@ -112,19 +112,19 @@ const Chatbot = () => {
           sender: 'bot',
           timestamp: new Date()
         };
-        
+
         setMessages(prev => [...prev, botMessage]);
 
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          
+
           const chunk = new TextDecoder().decode(value);
           botResponse += chunk;
-          
-          setMessages(prev => 
-            prev.map(msg => 
-              msg.id === botMessage.id 
+
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === botMessage.id
                 ? { ...msg, text: botResponse }
                 : msg
             )
@@ -157,11 +157,10 @@ const Chatbot = () => {
       {/* Chat Toggle Button */}
       <button
         onClick={handleToggleChat}
-        className={`fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 ${
-          isOpen 
-            ? 'bg-gradient-to-r from-red-500 to-pink-500 rotate-180' 
-            : 'bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse'
-        }`}
+        className={`fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 ${isOpen
+          ? 'bg-gradient-to-r from-red-500 to-pink-500 rotate-180'
+          : 'bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse'
+          }`}
       >
         {isOpen ? (
           <X className="w-6 h-6 text-white mx-auto" />
@@ -205,36 +204,40 @@ const Chatbot = () => {
                 key={message.id}
                 className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                <div className={`flex items-start gap-2 max-w-[80%] ${
-                  message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'
-                }`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    message.sender === 'user' 
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
-                      : 'bg-gradient-to-r from-blue-500 to-cyan-500'
+                <div className={`flex items-start gap-2 max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'
                   }`}>
+
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.sender === 'user'
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500'
+                    : 'bg-gradient-to-r from-blue-500 to-cyan-500'
+                    }`}>
                     {message.sender === 'user' ? (
                       <User className="w-4 h-4 text-white" />
                     ) : (
                       <Bot className="w-4 h-4 text-white" />
                     )}
                   </div>
-                  <div className={`px-4 py-2 rounded-2xl ${
-                    message.sender === 'user'
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                      : 'bg-white text-gray-800 border border-gray-200'
-                  }`}>
-                    <p className="text-sm leading-relaxed">{message.text}</p>
-                    <p className={`text-xs mt-1 ${
-                      message.sender === 'user' ? 'text-white/70' : 'text-gray-500'
+
+                  <div className={`px-4 py-2 rounded-2xl ${message.sender === 'user'
+                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                    : 'bg-white text-gray-800 border border-gray-200'
                     }`}>
+                    <div className="text-sm leading-relaxed space-y-2">
+                      {message.text.split('\n').map((line, index) => (
+                        <p key={index} className={line.trim() === '' ? 'h-2' : ''}>
+                          {line.trim() || '\u00A0'}
+                        </p>
+                      ))}
+                    </div>
+                    <p className={`text-xs mt-1 ${message.sender === 'user' ? 'text-white/70' : 'text-gray-500'
+                      }`}>
                       {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
                 </div>
               </div>
             ))}
-            
+
             {/* Typing Indicator */}
             {isTyping && (
               <div className="flex justify-start">
@@ -245,8 +248,8 @@ const Chatbot = () => {
                   <div className="bg-white px-4 py-2 rounded-2xl border border-gray-200">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                     </div>
                   </div>
                 </div>
