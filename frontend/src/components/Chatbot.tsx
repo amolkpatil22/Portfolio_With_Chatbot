@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
 import { api } from '../services/api';
+import { linkifyText } from '../utils/linkify';
 
 interface Message {
   id: string;
@@ -225,7 +226,7 @@ const Chatbot = () => {
                     <div className="text-sm leading-relaxed space-y-2">
                       {message.text.split('\n').map((line, index) => (
                         <p key={index} className={line.trim() === '' ? 'h-2' : ''}>
-                          {line.trim() || '\u00A0'}
+                          {line.trim() ? linkifyText(line) : '\u00A0'}
                         </p>
                       ))}
                     </div>
