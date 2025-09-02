@@ -82,12 +82,7 @@ export class AgenticLangChainService {
         }
       } else {
         // No search needed, stream the direct response
-        const directChain = this.promptTemplate.pipe(this.llm).pipe(new StringOutputParser());
-        const stream = await directChain.stream({ msgs: messages });
-
-        for await (const chunk of stream) {
-          yield chunk;
-        }
+        yield response.content;
       }
     } catch (error: any) {
       console.error('❌ AgenticLangChain error:', error.message);
