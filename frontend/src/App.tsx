@@ -8,6 +8,7 @@ import Projects from './components/Projects';
 import Skills from './components/Skills';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import Chatbot from './components/Chatbot';
 
 function App() {
   const [serverReady, setServerReady] = useState(false);
@@ -36,7 +37,5 @@ function App() {
     </div>
   );
 }
-
-import Chatbot from './components/Chatbot';
 
 export default App;

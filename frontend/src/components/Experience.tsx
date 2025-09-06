@@ -1,86 +1,69 @@
 import { useState } from 'react';
-import { Calendar, MapPin, Building } from 'lucide-react';
+import { Calendar, MapPin, Building, Loader2 } from 'lucide-react';
+import { useIntersectionFetch } from '../hooks/useIntersectionFetch';
+import { api, Portfolio } from '../services/api';
 
 const Experience = () => {
   const [showAll, setShowAll] = useState(false);
+  const { data: apiExperiences, loading, setRef } = useIntersectionFetch<Portfolio[]>(
+    () => api.getPortfolioByType('experience')
+  );
 
-  const experiences = [
-    {
-      id: 1,
-      company: 'TechCorp Solutions',
-      position: 'Senior Full Stack Developer',
-      location: 'San Francisco, CA',
-      duration: 'Jan 2023 - Present',
-      type: 'Full-time',
-      description: 'Leading development of scalable web applications and mentoring junior developers.',
-      achievements: [
-        'Built and deployed 5+ production applications serving 10k+ users',
-        'Reduced application load time by 40% through optimization techniques',
-        'Led a team of 3 developers on a major e-commerce platform redesign',
-        'Implemented CI/CD pipelines reducing deployment time by 60%'
-      ],
-      technologies: ['React', 'Node.js', 'PostgreSQL', 'AWS', 'Docker'],
-      companyLogo: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg',
-      color: 'from-purple-500 to-pink-500'
-    },
-    {
-      id: 2,
-      company: 'StartupXYZ',
-      position: 'Full Stack Developer',
-      location: 'Remote',
-      duration: 'Jun 2021 - Dec 2022',
-      type: 'Full-time',
-      description: 'Developed MVP and core features for a fast-growing fintech startup.',
-      achievements: [
-        'Built the entire frontend from scratch using React and TypeScript',
-        'Designed and implemented RESTful APIs handling 1M+ requests daily',
-        'Integrated payment systems with Stripe and PayPal',
-        'Collaborated with design team to create pixel-perfect UI components'
-      ],
-      technologies: ['React', 'TypeScript', 'Express.js', 'MongoDB', 'Stripe'],
-      companyLogo: 'https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg',
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
-      id: 3,
-      company: 'Digital Agency Pro',
-      position: 'Frontend Developer',
-      location: 'New York, NY',
-      duration: 'Aug 2020 - May 2021',
-      type: 'Full-time',
-      description: 'Created responsive websites and web applications for various clients.',
-      achievements: [
-        'Delivered 15+ client projects with 100% on-time completion rate',
-        'Improved website performance scores by average of 35%',
-        'Implemented responsive designs supporting all device types',
-        'Collaborated with UX/UI designers on user experience improvements'
-      ],
-      technologies: ['HTML/CSS', 'JavaScript', 'React', 'Sass', 'WordPress'],
-      companyLogo: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg',
-      color: 'from-green-500 to-emerald-500'
-    },
-    {
-      id: 4,
-      company: 'FreelanceWork',
-      position: 'Web Developer',
-      location: 'Remote',
-      duration: 'Jan 2020 - Jul 2020',
-      type: 'Freelance',
-      description: 'Provided web development services to small businesses and startups.',
-      achievements: [
-        'Completed 10+ freelance projects for various industries',
-        'Built custom WordPress themes and plugins',
-        'Helped clients increase online presence and sales',
-        'Maintained long-term relationships with repeat clients'
-      ],
-      technologies: ['WordPress', 'PHP', 'JavaScript', 'MySQL', 'HTML/CSS'],
-      companyLogo: 'https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg',
-      color: 'from-orange-500 to-red-500'
-    }
-  ];
+  // Transform API data to match existing UI structure
+  const experiences = apiExperiences?.map((exp, index) => ({
+    id: index + 1,
+    company: exp.metadata?.company || 'Company',
+    position: exp.title,
+    location: exp.metadata?.location || 'Location',
+    duration: exp.metadata?.startDate && exp.metadata?.endDate
+      ? `${exp.metadata.startDate} - ${exp.metadata.endDate}`
+      : 'Duration',
+    type: exp.metadata?.employmentType || 'Full-time',
+    description: exp.content,
+    achievements: exp.metadata?.keyAchievements || [],
+    technologies: exp.metadata?.skills || [],
+    companyLogo: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg',
+    color: ['from-purple-500 to-pink-500', 'from-blue-500 to-cyan-500', 'from-green-500 to-emerald-500'][index % 3]
+  })) || [];
+
+
+  if (loading) {
+    return (
+      <section ref={setRef} id="experience" className="py-20 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center space-x-2">
+            <Loader2 className="w-6 h-6 animate-spin text-purple-600" />
+            <span className="text-gray-600">Loading experience...</span>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Show message if no experience data
+  if (!loading && experiences.length === 0) {
+    return (
+      <section ref={setRef} id="experience" className="py-20 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+              Work Experience
+            </h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              My professional journey and the impact I've made at various organizations
+            </p>
+          </div>
+          <div className="text-center text-gray-600">
+            <Building className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+            <p className="text-lg">Experience information will be available soon.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section id="experience" className="py-20 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+    <section ref={setRef} id="experience" className="py-20 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
@@ -156,7 +139,7 @@ const Experience = () => {
                         <div className="mb-6">
                           <h4 className="text-lg font-semibold text-gray-800 mb-3">Key Achievements</h4>
                           <ul className="space-y-2">
-                            {exp.achievements.map((achievement, achIndex) => (
+                            {exp.achievements.map((achievement: string, achIndex: number) => (
                               <li key={achIndex} className="flex items-start gap-3">
                                 <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mt-2 flex-shrink-0"></div>
                                 <span className="text-gray-600 text-sm leading-relaxed">{achievement}</span>
@@ -169,7 +152,7 @@ const Experience = () => {
                         <div>
                           <h4 className="text-sm font-semibold text-gray-700 mb-3">Technologies Used</h4>
                           <div className="flex flex-wrap gap-2">
-                            {exp.technologies.map((tech, techIndex) => (
+                            {exp.technologies.map((tech: string, techIndex: number) => (
                               <span
                                 key={techIndex}
                                 className={`px-3 py-1 bg-gradient-to-r ${exp.color} text-white rounded-full text-xs font-medium shadow-sm`}

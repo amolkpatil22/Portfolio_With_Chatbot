@@ -1,10 +1,8 @@
 import { PineconeService } from './PineconeService';
-import { LangChainService } from './LangChainService';
 import { AgenticLangChainService } from './AgenticLangChainService';
 
 class ServiceManager {
   private static pineconeInstance: PineconeService;
-  private static langChainInstance: LangChainService;
   private static agenticLangChainInstance: AgenticLangChainService;
 
   static getPineconeService(): PineconeService {
@@ -12,13 +10,6 @@ class ServiceManager {
       this.pineconeInstance = new PineconeService();
     }
     return this.pineconeInstance;
-  }
-
-  static getLangChainService(): LangChainService {
-    if (!this.langChainInstance) {
-      this.langChainInstance = new LangChainService();
-    }
-    return this.langChainInstance;
   }
 
   static getAgenticLangChainService(): AgenticLangChainService {
