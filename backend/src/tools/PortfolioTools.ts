@@ -4,7 +4,7 @@ import { ServiceManager } from '../services/ServiceManager';
 export class PortfolioTools {
   static async searchPortfolio(query: string, type?: string) {
     const pineconeService = ServiceManager.getPineconeService();
-    
+
     // Use Pinecone metadata filtering if type is specified
     const hits = await pineconeService.query(query, 3, type);
     const ids = hits.map((hit: any) => hit._id);
@@ -16,14 +16,27 @@ export class PortfolioTools {
 
       let metadataText = "";
       if (portfolio.metadata) {
-        metadataText = "\nMetadata:\n" + 
+        metadataText =
+          "\nMetadata:\n" +
           Object.entries(portfolio.metadata)
-            .map(([key, value]) => `- ${key}: ${typeof value === "object" ? JSON.stringify(value) : value}`)
+            .map(([key, value]) => {
+              if (Array.isArray(value)) {
+                return `- ${key}: ${value.join(", ")}`;
+              } else if (typeof value === "object" && value !== null) {
+                // Flatten nested objects instead of JSON.stringify
+                return `- ${key}: ${Object.entries(value)
+                  .map(([k, v]) => `${k}=${v}`)
+                  .join(", ")}`;
+              } else {
+                return `- ${key}: ${value}`;
+              }
+            })
             .join("\n");
       }
 
-      return `${portfolio.type}: ${portfolio.title}\n${portfolio.content}${metadataText}`;
+      return `Type: ${portfolio.type}\nTitle: ${portfolio.title}\nContent: ${portfolio.content}${metadataText}`;
     }).filter(Boolean).join("\n\n");
+
   }
 
   static getToolDefinitions() {
@@ -41,7 +54,7 @@ export class PortfolioTools {
             type: {
               type: "string",
               description: "Optional: Filter by specific type using Pinecone metadata (project, experience, personal, skill, faq, education)",
-              enum: ["project", "experience", "personal", "skill", "faq", "education"]
+              enum: ["project", "experience", "personal", "skills", "faq", "education"]
             }
           },
           required: ["query"]

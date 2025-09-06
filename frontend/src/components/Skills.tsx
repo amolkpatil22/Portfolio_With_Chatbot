@@ -1,47 +1,61 @@
-import React from 'react';
+import { Loader2 } from 'lucide-react';
+import { useIntersectionFetch } from '../hooks/useIntersectionFetch';
+import { api, Portfolio } from '../services/api';
 
 const Skills = () => {
-  const skillCategories = [
-    {
-      title: 'Frontend',
-      color: 'from-pink-500 to-rose-500',
-      skills: [
-        'React',
-        'TypeScript',
-        'Tailwind CSS',
-        'Next.js',
-        'HTML/CSS',
-        'JavaScript',
-      ],
-    },
-    {
-      title: 'Backend',
-      color: 'from-blue-500 to-cyan-500',
-      skills: [
-        'Node.js',
-        'Python',
-        'Express.js',
-        'Django',
-        'REST APIs',
-        'GraphQL',
-      ],
-    },
-    {
-      title: 'Database & Tools',
-      color: 'from-green-500 to-emerald-500',
-      skills: [
-        'PostgreSQL',
-        'MongoDB',
-        'Redis',
-        'Git',
-        'Docker',
-        'AWS',
-      ],
-    },
+  const { data: apiSkills, loading, setRef } = useIntersectionFetch<Portfolio[]>(
+    () => api.getPortfolioByType('skills')
+  );
+
+  const colors = [
+    'from-pink-500 to-rose-500',
+    'from-blue-500 to-cyan-500',
+    'from-green-500 to-emerald-500',
+    'from-purple-500 to-indigo-500'
   ];
 
+  // Transform API data to match existing UI structure
+  const skillCategories = apiSkills?.map((skill, index) => ({
+    title: skill.title,
+    color: colors[index % colors.length],
+    skills: skill.metadata?.skills || []
+  })) || [];
+
+  if (loading) {
+    return (
+      <section ref={setRef} id="skills" className="py-20 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center space-x-2">
+            <Loader2 className="w-6 h-6 animate-spin text-purple-600" />
+            <span className="text-gray-600">Loading skills...</span>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!loading && skillCategories.length === 0) {
+    return (
+      <section ref={setRef} id="skills" className="py-20 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+              Skills & Technologies
+            </h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Here are some of the technologies I work with regularly
+            </p>
+          </div>
+          <div className="text-center text-gray-600">
+            <p className="text-lg">Skills information will be available soon.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section id="skills" className="py-20 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
+    <section ref={setRef} id="skills" className="py-20 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
@@ -52,7 +66,7 @@ const Skills = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {skillCategories.map((category, categoryIndex) => (
             <div
               key={categoryIndex}
@@ -65,7 +79,7 @@ const Skills = () => {
                 {category.title}
               </h3>
               <div className="flex flex-wrap gap-3 justify-center">
-                {category.skills.map((skill, skillIndex) => (
+                {category.skills.map((skill: string, skillIndex: number) => (
                   <span
                     key={skillIndex}
                     className={`px-4 py-2 bg-gradient-to-r ${category.color} text-white rounded-full font-medium text-sm hover:scale-105 transition-transform duration-200 shadow-md`}

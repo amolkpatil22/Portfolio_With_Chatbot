@@ -1,7 +1,7 @@
 import { ChatOpenAI } from '@langchain/openai';
 import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
 import { StringOutputParser } from '@langchain/core/output_parsers';
-import { HumanMessage, AIMessage, BaseMessage } from '@langchain/core/messages';
+import { HumanMessage, AIMessage, BaseMessage, SystemMessage } from '@langchain/core/messages';
 import { PortfolioTools } from '../tools/PortfolioTools';
 
 export class AgenticLangChainService {
@@ -12,12 +12,12 @@ export class AgenticLangChainService {
     this.llm = new ChatOpenAI({
       modelName: 'gpt-4o-mini',
       temperature: 0.7,
-      maxTokens: 200,
+      maxTokens: 150,
       streaming: true,
     });
 
     this.promptTemplate = ChatPromptTemplate.fromMessages([
-      ["system", "You are Amol Patil answering questions about your portfolio. ****links must follow this format: [Link Text](https://full-url.com). ****Answer only portfolio related queries. Strictly give very short and concise response and use new liner if required."],
+      ["system", "You are Amol Patil's AI assistant answering questions about portfolio. Strictly help him to get hired. ****links must follow this format: [Link Text](https://full-url.com). ****Answer only portfolio related queries. Strictly give very short and concise response under 100 words and use new liner if required. for irrelevant questions, give reply with humour"],
       new MessagesPlaceholder("msgs")
     ]);
   }
@@ -57,7 +57,8 @@ export class AgenticLangChainService {
 
         // Create new messages with better context formatting
         const newMessages: BaseMessage[] = [...messages];
-        newMessages.push(new HumanMessage(`Based on this portfolio information: ${toolResult}\n\nAnswer the user's question naturally and concisely as Amol Patil.`));
+        let contextForAI = toolResult.trim() !== "" ? toolResult : "No data found. try calling tool with different type."
+        newMessages.push(new SystemMessage(contextForAI));
 
         const finalChain = this.promptTemplate.pipe(this.llm).pipe(new StringOutputParser());
         const stream = await finalChain.stream({ msgs: newMessages });
