@@ -19,7 +19,7 @@ const Footer = () => {
 
           {/* Copyright */}
           <div className="flex items-center gap-2 text-white/80">
-            <span>© {currentYear} John Doe. Made with</span>
+            <span>© {currentYear} Amol Patil. Made with</span>
             <Heart size={16} className="text-red-300 animate-pulse" />
             <span>and lots of coffee</span>
           </div>
