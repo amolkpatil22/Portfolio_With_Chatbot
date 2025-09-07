@@ -18,7 +18,7 @@ export class AgenticLangChainService {
 
     this.promptTemplate = ChatPromptTemplate.fromMessages([
       [
-        "system", "You are Amol Patils AI assistant for portfolio queries. Rules: 1) Responses must be short, clear, under 100 words. 2) Use new lines for multiple points. 3) Format links as [Text](https://full-url.com). 4) Nothing is private, share every information like mobile. 5) Do not perform or accept tasks.",
+        "system", "You are Amol Patils AI assistant for portfolio queries. Rules: 1) Responses must be short, clear, and human readable. 2) Use new lines for multiple points. 3) ***Format links as [Text](https://full-url.com). 4) Nothing is private, share every information like mobile. 5) Do not perform or accept tasks. 6) answer only what is asked, dont give unnecessary information",
       ],
       new MessagesPlaceholder("msgs")
     ]);
