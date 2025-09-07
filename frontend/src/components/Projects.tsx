@@ -1,92 +1,31 @@
 import { useState } from 'react';
-import { ExternalLink, Github, Search, Filter } from 'lucide-react';
+import { ExternalLink, Github, Search, Filter, Loader2 } from 'lucide-react';
+import { useIntersectionFetch } from '../hooks/useIntersectionFetch';
+import { api, Portfolio } from '../services/api';
 
 const Projects = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAll, setShowAll] = useState(false);
+  const { data: apiProjects, loading, setRef } = useIntersectionFetch<Portfolio[]>(
+    () => api.getPortfolioByType('project')
+  );
 
-  // This would be replaced with your backend data
-  const projects = [
-    {
-      id: 1,
-      name: 'E-Commerce Platform',
-      description: 'A full-featured e-commerce platform with admin dashboard, payment integration, and inventory management.',
-      image: 'https://images.pexels.com/photos/34577/pexels-photo.jpg',
-      techStack: ['React', 'Node.js', 'PostgreSQL', 'Stripe', 'AWS'],
-      category: 'Full Stack',
-      githubLink: 'https://github.com/username/ecommerce',
-      deployedLink: 'https://ecommerce-demo.com',
-      featured: true,
-      status: 'Completed',
-      color: 'from-purple-500 to-pink-500'
-    },
-    {
-      id: 2,
-      name: 'Task Management App',
-      description: 'A collaborative project management tool with real-time updates, team collaboration features.',
-      image: 'https://images.pexels.com/photos/7376/startup-photos.jpg',
-      techStack: ['React', 'TypeScript', 'Socket.io', 'Express', 'MongoDB'],
-      category: 'Full Stack',
-      githubLink: 'https://github.com/username/taskmanager',
-      deployedLink: 'https://taskmanager-demo.com',
-      featured: true,
-      status: 'Completed',
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
-      id: 3,
-      name: 'Weather Dashboard',
-      description: 'A responsive weather application with location-based forecasts and interactive charts.',
-      image: 'https://images.pexels.com/photos/209831/pexels-photo-209831.jpeg',
-      techStack: ['React', 'Chart.js', 'Weather API', 'Tailwind CSS'],
-      category: 'Frontend',
-      githubLink: 'https://github.com/username/weather-app',
-      deployedLink: 'https://weather-dashboard-demo.com',
-      featured: false,
-      status: 'Completed',
-      color: 'from-green-500 to-emerald-500'
-    },
-    {
-      id: 4,
-      name: 'API Authentication Service',
-      description: 'A robust authentication microservice with JWT tokens, role-based access control.',
-      image: 'https://images.pexels.com/photos/270557/pexels-photo-270557.jpeg',
-      techStack: ['Node.js', 'Express', 'JWT', 'PostgreSQL', 'Docker'],
-      category: 'Backend',
-      githubLink: 'https://github.com/username/auth-service',
-      deployedLink: null,
-      featured: false,
-      status: 'Completed',
-      color: 'from-orange-500 to-red-500'
-    },
-    {
-      id: 5,
-      name: 'Social Media Dashboard',
-      description: 'Analytics dashboard for social media management with data visualization and reporting.',
-      image: 'https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg',
-      techStack: ['Next.js', 'Python', 'Django', 'Chart.js', 'PostgreSQL'],
-      category: 'Full Stack',
-      githubLink: 'https://github.com/username/social-dashboard',
-      deployedLink: 'https://social-dashboard-demo.com',
-      featured: true,
-      status: 'In Progress',
-      color: 'from-indigo-500 to-purple-500'
-    },
-    {
-      id: 6,
-      name: 'Mobile Fitness Tracker',
-      description: 'React Native app for fitness tracking with workout plans and progress monitoring.',
-      image: 'https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg',
-      techStack: ['React Native', 'Firebase', 'Node.js', 'MongoDB'],
-      category: 'Mobile',
-      githubLink: 'https://github.com/username/fitness-tracker',
-      deployedLink: null,
-      featured: false,
-      status: 'Completed',
-      color: 'from-teal-500 to-green-500'
-    }
-  ];
+  // Use only API data
+  const projects = apiProjects?.map((project, index) => ({
+    id: index + 1,
+    name: project.title,
+    description: project.content,
+    image: project.metadata?.links?.bannerImage,
+    techStack: project.metadata?.skills || [],
+    category: 'Full Stack',
+    githubLink: project.metadata?.links?.github || '#',
+    deployedLink: project.metadata?.links?.website || null,
+    featured: index < 3,
+    status: 'Completed',
+    color: ['from-purple-500 to-pink-500', 'from-blue-500 to-cyan-500', 'from-green-500 to-emerald-500'][index % 3]
+  })) || [];
+
 
   const categories = ['All', 'Full Stack', 'Frontend', 'Backend', 'Mobile'];
 
@@ -167,7 +106,7 @@ const Projects = () => {
   );
 
   return (
-    <section id="projects" className="py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <section ref={setRef} id="projects" className="py-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
@@ -210,13 +149,27 @@ const Projects = () => {
         </div>
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {displayedProjects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-6 h-6 animate-spin text-purple-600" />
+            <span className="ml-2 text-gray-600">Loading projects...</span>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {displayedProjects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        )}
 
-        {displayedProjects.length === 0 && (
+        {!loading && projects.length === 0 ? (
+          <div className="text-center py-12">
+            <Filter size={48} className="mx-auto text-gray-400 mb-4" />
+            <p className="text-gray-600 text-lg">
+              No projects to show
+            </p>
+          </div>
+        ) : displayedProjects.length === 0 && (
           <div className="text-center py-12">
             <Filter size={48} className="mx-auto text-gray-400 mb-4" />
             <p className="text-gray-600 text-lg">
