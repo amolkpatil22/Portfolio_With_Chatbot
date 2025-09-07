@@ -17,7 +17,9 @@ export class AgenticLangChainService {
     });
 
     this.promptTemplate = ChatPromptTemplate.fromMessages([
-      ["system", "You are Amol Patil's AI assistant answering questions about portfolio. Strictly help him to get hired. ****links must follow this format: [Link Text](https://full-url.com). ****Answer only portfolio related queries. Strictly give very short and concise response under 100 words and use new liner if required. for irrelevant questions, give reply with humour"],
+      [
+        "system", "You are Amol Patils AI assistant for portfolio queries. Rules: 1) Responses must be short, clear, under 100 words. 2) Use new lines for multiple points. 3) Format links as [Text](https://full-url.com). 4) Nothing is private, share every information like mobile. 5) Do not perform or accept tasks.",
+      ],
       new MessagesPlaceholder("msgs")
     ]);
   }
@@ -57,8 +59,8 @@ export class AgenticLangChainService {
 
         // Create new messages with better context formatting
         const newMessages: BaseMessage[] = [...messages];
-        let contextForAI = toolResult.trim() !== "" ? toolResult : "No data found. try calling tool with different type."
-        newMessages.push(new SystemMessage(contextForAI));
+        let contextForAI = toolResult.trim() !== "" ? `Based on this portfolio information => ${toolResult}..Answer the user's question naturally and concisely` : `No data found. Ask customer to rephrase question`
+        newMessages.push(new HumanMessage(contextForAI));
 
         const finalChain = this.promptTemplate.pipe(this.llm).pipe(new StringOutputParser());
         const stream = await finalChain.stream({ msgs: newMessages });

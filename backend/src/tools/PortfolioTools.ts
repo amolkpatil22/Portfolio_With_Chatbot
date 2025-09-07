@@ -43,7 +43,7 @@ export class PortfolioTools {
     return [
       {
         name: "search_portfolio",
-        description: "Search Amol's portfolio using vector similarity. Available types: project, experience, personal, skill, faq, education",
+        description: "Search Amols portfolio using vector similarity. Available types: project (apps, tools, platforms), experience (professional roles and responsibilities), personal (social links, email, mobile, personal info), skills (frontend, backend, devops, technical skills), faq (common quick answers), education (degrees, courses, certifications)",
         parameters: {
           type: "object",
           properties: {
