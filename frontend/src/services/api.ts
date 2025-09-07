@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:3000';
+const API_BASE = 'https://portfolio-with-chatbot-iwd0.onrender.com';
 
 export interface Portfolio {
   _id: string;

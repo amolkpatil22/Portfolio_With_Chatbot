@@ -32,7 +32,7 @@ const Projects = () => {
   const filteredProjects = projects.filter(project => {
     const matchesCategory = selectedCategory === 'All' || project.category === selectedCategory;
     const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.techStack.some(tech => tech.toLowerCase().includes(searchTerm.toLowerCase()));
+      project.techStack.some((tech: String) => tech.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
 

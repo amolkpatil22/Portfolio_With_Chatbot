@@ -9,6 +9,7 @@ import Skills from './components/Skills';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
+import GitHubStats from './components/GitHubStats';
 
 function App() {
   const [serverReady, setServerReady] = useState(false);
@@ -31,6 +32,7 @@ function App() {
       <Experience />
       <Skills />
       <Projects />
+      <GitHubStats />
       <Contact />
       <Footer />
       <Chatbot />

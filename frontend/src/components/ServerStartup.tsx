@@ -18,7 +18,7 @@ const ServerStartup: React.FC<ServerStartupProps> = ({ onServerReady }) => {
     try {
       setStatus('starting');
       setMessage('Starting server... Maximum wait time: 60 seconds');
-      
+
       // Countdown timer
       const countdownInterval = setInterval(() => {
         setCountdown(prev => {
@@ -33,7 +33,7 @@ const ServerStartup: React.FC<ServerStartupProps> = ({ onServerReady }) => {
       }, 1000);
 
       // Check if server is running
-      const response = await fetch('http://localhost:3000', {
+      const response = await fetch('https://portfolio-with-chatbot-iwd0.onrender.com', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ const ServerStartup: React.FC<ServerStartupProps> = ({ onServerReady }) => {
       if (response.ok) {
         setStatus('success');
         setMessage('Server is ready! Redirecting to portfolio...');
-        
+
         // Wait 2 seconds before redirecting
         setTimeout(() => {
           onServerReady();
