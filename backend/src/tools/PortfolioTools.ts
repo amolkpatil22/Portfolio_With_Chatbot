@@ -53,7 +53,7 @@ export class PortfolioTools {
             },
             type: {
               type: "string",
-              description: "Optional: Filter by specific type using Pinecone metadata (project, experience, personal, skill, faq, education)",
+              description: "OPTIONAL: Only use if the query clearly indicates a specific type. Leave empty if uncertain. Available: project, experience, personal, skills, faq, education",
               enum: ["project", "experience", "personal", "skills", "faq", "education"]
             }
           },
