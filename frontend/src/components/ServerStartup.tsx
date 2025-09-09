@@ -8,7 +8,7 @@ interface ServerStartupProps {
 const ServerStartup: React.FC<ServerStartupProps> = ({ onServerReady }) => {
   const [status, setStatus] = useState<'starting' | 'success' | 'error'>('starting');
   const [message, setMessage] = useState('Waking up the server...');
-  const [countdown, setCountdown] = useState(60);
+  const [countdown, setCountdown] = useState(120);
 
   useEffect(() => {
     startServer();
@@ -17,7 +17,7 @@ const ServerStartup: React.FC<ServerStartupProps> = ({ onServerReady }) => {
   const startServer = async () => {
     try {
       setStatus('starting');
-      setMessage('Starting server... Maximum wait time: 60 seconds');
+      setMessage('Starting server... Maximum wait time: 120 seconds');
 
       // Countdown timer
       const countdownInterval = setInterval(() => {
@@ -121,7 +121,7 @@ const ServerStartup: React.FC<ServerStartupProps> = ({ onServerReady }) => {
           {/* Additional Info */}
           <div className="mt-6 text-white/60 text-xs">
             <p>Free servers need time to wake up</p>
-            <p>Maximum wait time: 60 seconds</p>
+            <p>Maximum wait time: 120 seconds</p>
           </div>
         </div>
       </div>
