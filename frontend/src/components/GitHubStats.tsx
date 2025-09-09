@@ -153,7 +153,7 @@ const GitHubStats = () => {
           <h3 className="text-lg font-bold text-gray-800 mb-4 text-center">Contribution Streak</h3>
           <div className="flex justify-center">
             <img 
-              src={`https://streak-stats.demolab.com/?user=${username}&theme=default&hide_border=true`}
+              src={`https://github-readme-streak-stats-salesp07.vercel.app/?user=${username}&theme=default&hide_border=true`}
               alt="GitHub Streak"
               className="max-w-full h-auto"
               onError={(e) => {
