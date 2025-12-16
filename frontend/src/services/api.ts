@@ -1,4 +1,5 @@
-const API_BASE = 'https://portfolio-with-chatbot-iwd0.onrender.com';
+// const API_BASE = 'https://portfolio-with-chatbot-iwd0.onrender.com';
+export const API_BASE = 'https://portfoliowithchatbotserver.vercel.app';
 
 export interface Portfolio {
   _id: string;

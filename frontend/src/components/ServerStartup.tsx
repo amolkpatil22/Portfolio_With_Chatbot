@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Server, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { API_BASE } from '../services/api';
 
 interface ServerStartupProps {
   onServerReady: () => void;
@@ -33,7 +34,7 @@ const ServerStartup: React.FC<ServerStartupProps> = ({ onServerReady }) => {
       }, 1000);
 
       // Check if server is running
-      const response = await fetch('https://portfolio-with-chatbot-iwd0.onrender.com', {
+      const response = await fetch(API_BASE, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
