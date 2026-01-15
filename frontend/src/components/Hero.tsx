@@ -6,17 +6,17 @@ const Hero = () => {
   const { data: aboutData, loading, setRef } = useIntersectionFetch<Portfolio[]>(
     () => api.getPortfolioByType('personal')
   );
-
+  
   return (
     <section ref={setRef} id="home" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 relative overflow-hidden">
       {/* Animated background elements */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 z-0">
         <div className="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-yellow-300/10 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div className="space-y-8">
           {/* Profile Image */}
           <div className="relative mx-auto w-32 h-32 md:w-40 md:h-40">
