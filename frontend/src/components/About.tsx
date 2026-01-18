@@ -14,7 +14,7 @@ const About = () => {
     { icon: Code, label: 'Projects Completed', value: '10+' },
     { icon: Coffee, label: 'Cups of Coffee', value: '1000+' },
     { icon: Users, label: 'Happy Clients', value: '4+' },
-    { icon: Award, label: 'Years Experience', value: '2+' },
+    { icon: Award, label: 'Years Experience', value: '4+' },
   ];
 
   return (
